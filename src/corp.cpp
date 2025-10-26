@@ -10,16 +10,19 @@ Corp::Corp(int i){
     else if(i==1){
         shape_p.setRadius(25.f);
         shape_p.setFillColor(sf::Color::Cyan);
+        shape_p.setOrigin({25.f,25.f});
         type=1;
     }
     else if(i==2){
         shape_p.setRadius(25.f);
-        shape_p.setFillColor(sf::Color::Cyan);
+        shape_p.setFillColor(sf::Color::Blue);
+        shape_p.setOrigin({25.f,25.f});
         type=2;
     }
     else if(i==3){
         shape.setSize({5.f,5.f});
         shape.setFillColor(sf::Color::Black);
+        shape.setOrigin({2.5f,2.5f});
         type=3;
     }
 
@@ -62,7 +65,13 @@ void Corp::run(sf::RenderWindow &win){
     else if(type==3){
         corda();            //corda
     }
-
-    win.draw(shape);
 }
 */
+
+void Corp::draw(sf::RenderWindow &win){
+    if(type==0 || type==3){
+        win.draw(shape);
+    }else if(type==1 || type==2){
+        win.draw(shape_p);
+    }
+}

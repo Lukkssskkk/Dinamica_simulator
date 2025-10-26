@@ -19,15 +19,34 @@ Dinamica::Dinamica(float x, float y){
     button_info.setSize({25.f,25.f});
     button_info.setTexture(&info_t);
     button_info.setPosition({x-25.f,0.f});
+    //Button start:
+    startsm.setSize({25.f,25.f});
+    startsm.setFillColor(sf::Color::Blue);
+    startsm.setPosition({x/2-12.5f,0.f});
     //Space:
     space_sim.setSize({x,y});
     space_sim.setFillColor(sf::Color::White);
+    //VARS:
     isclicked=false;
     sim_act=true;
     menu_act=false;
     infos_act=false;
     add_obj_mov=false;
     selection=-1;
+    corp_type=-1;
+    start=false;
+    text=false;
+    ga=false;
+    gm=false;
+    gv=false;
+    gf=false;
+    gan=false;
+    gkel=false;
+    gkat=false;
+    gqmov=false;
+    gwork=false;
+    gkat=false;
+    f=true;
 }
 
 void Dinamica::run(sf::RenderWindow &win){
@@ -35,18 +54,62 @@ void Dinamica::run(sf::RenderWindow &win){
 
         isclicked=false;
 
-        while(auto ev = win.pollEvent()){
-            const sf::Event e = *ev;
-            processEvents(e,win);
+        processEvents(win);
+        Draw(win);
+        sf::sleep(sf::milliseconds(10));
+    }
+}
+
+void Dinamica::processEvents(sf::RenderWindow &win){
+    mouse.setPosition({(float)sf::Mouse::getPosition(win).x,(float)sf::Mouse::getPosition(win).y});
+    while(const std::optional ev = win.pollEvent()){
+        if(ev->is<sf::Event::Closed>()){
+            win.close();
         }
-        mouse.setPosition({(float)sf::Mouse::getPosition(win).x,(float)sf::Mouse::getPosition(win).y});
-        win.clear(sf::Color::Black);
+        if(ev->is<sf::Event::MouseButtonPressed>() && isclicked==false){
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                isclicked=true;
+            }
+        }
+        if (const auto* textEntered = ev->getIf<sf::Event::TextEntered>()) {
+            if (text) {
+                char c = static_cast<char>(textEntered->unicode);
+                if (c == 8 && !input_text.empty()) {
+                    input_text.pop_back();
+                } else if (std::isprint(c)) {
+                    input_text += c;
+                }
+            }
+        }
+        if (const auto* keyPressed = ev->getIf<sf::Event::KeyReleased>()) {
+            if(keyPressed->scancode == sf::Keyboard::Scan::Enter){
+                if(text){
+                    input_text.clear();
+                    text=false;
+                    if(d==true){
+                        if(f==true){
+                            f=false;
+                        }else{
+                            f=true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void Dinamica::Simulator(sf::RenderWindow &win){
+    for(int i=0;i<corps.size();i++){
+        corps[i].draw(win);
+    }
+}
+
+void Dinamica::Draw(sf::RenderWindow &win){
+    win.clear(sf::Color::Black);
         
         //Draw part:
-        if(sim_act){
-            Simulator(win);
-        }
-
+        win.draw(space_sim);
         if(button_click(button_menu)){
             if(menu_act == false){
                 menu_act=true;
@@ -67,23 +130,12 @@ void Dinamica::run(sf::RenderWindow &win){
             infos(win);
         }
 
-        win.draw(mouse);
-        win.draw(button_info);
-        win.draw(button_menu);
+    Simulator(win);
+
+    //win.draw(mouse);
+    win.draw(button_info);
+    win.draw(button_menu);
+    win.draw(startsm);
         
-        win.display();
-        sf::sleep(sf::milliseconds(10));
-    }
+    win.display();
 }
-
-void Dinamica::processEvents(sf::Event ev,sf::RenderWindow &win){
-    if(ev.is<sf::Event::Closed>()){
-        win.close();
-    }
-    if(ev.is<sf::Event::MouseButtonPressed>() && isclicked==false){
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-            isclicked=true;
-        }
-    }
-}
-
