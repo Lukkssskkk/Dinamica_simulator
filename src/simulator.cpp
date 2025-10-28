@@ -1,4 +1,7 @@
-#include"simulador_dinamica.hpp"
+#include"simulator.hpp"
+
+sf::Clock time_pf;
+float ts=0.0f;
 
 Dinamica::Dinamica(float x, float y){
     //Get font:
@@ -20,22 +23,31 @@ Dinamica::Dinamica(float x, float y){
     startsm.setSize({25.f,25.f});
     startsm.setFillColor(sf::Color::Blue);
     startsm.setPosition({x/2-12.5f,0.f});
+    //Button Restart:
+    reset_button.setSize({25.f,25.f});
+    reset_button.setFillColor(sf::Color::Red);
+    reset_button.setPosition({x/2+20.f,0.f});
     //VARS:
     isclicked=false;
+    timeperframe=1.f;
     s=0;
     selection=-1;
     text=false;
     g=-1;
     f=true;
+    help_b=false;
+    start_b=false;
+    restart_b=false;
 }
 
 void Dinamica::run(sf::RenderWindow &win){
+    Help Mhelp(win);
     while(win.isOpen()){
 
         isclicked=false;
 
         processEvents(win);
-        Draw(win);
+        Draw(win,Mhelp);
         sf::sleep(sf::milliseconds(10));
     }
 }
@@ -66,13 +78,10 @@ void Dinamica::processEvents(sf::RenderWindow &win){
                 if(text){
                     input_text.clear();
                     text=false;
-                    if(d==true){
-                        if(f==true){
-                            f=false;
-                        }else{
-                            f=true;
-                        }
+                    if (d) {
+                        f = !f;
                     }
+
                 }
             }
         }
@@ -81,33 +90,56 @@ void Dinamica::processEvents(sf::RenderWindow &win){
 
 
 
-void Dinamica::Draw(sf::RenderWindow &win){
-    win.clear(sf::Color::White);
+void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
 
-    if(button_click(button_menu) && s!=1){
-        s=1;
-    }
-    else if(button_click(button_info) && s!=2){
-        s=2;
-    }
-    else if( (button_click(button_info) && s==2) || (s==1 && button_click(button_menu)) ){
-        s=0;
-    }
+    if(!help_b){
+        win.clear(sf::Color::White);
+        float tr = time_pf.restart().asSeconds();
+        ts += tr/timeperframe;
+        if(button_click(button_menu) && s!=1){
+            s=1;
+        }
+        else if(button_click(button_info) && s!=2){
+            s=2;
+        }
+        else if( (button_click(button_info) && s==2) || (s==1 && button_click(button_menu)) ){
+            s=0;
+        }
+        if(button_click(startsm)){
+            start_b= !start_b;
+        }
+        if(button_click(reset_button)){
+            restart_b = !restart_b;
+        }
 
-    if(s==2){
-        infos(win);
-    }
-    else if(s==1){
-        menu(win);
-    }
+        if(s==2){
+            infos(win);
+        }
+        else if(s==1){
+            menu(win);
+        }
 
-    for(int i=0;i<corps.size();i++){
-        corps[i].draw(win);
-    }
-
-    win.draw(button_info);
-    win.draw(button_menu);
-    win.draw(startsm);
         
-    win.display();
+        for(int i=0;i<corps.size();i++){
+            if (ts >= 1.0f && start_b) {
+                corps[i].run();
+                ts = 0.0f;
+            }if(restart_b){
+                corps[i].shape.setPosition(corps[i].origin);
+            }
+            if(!start_b){
+                corps[i].origin=corps[i].shape.getPosition();
+            }
+            corps[i].draw(win);
+        }
+
+        win.draw(button_info);
+        win.draw(button_menu);
+        win.draw(startsm);
+        win.draw(reset_button);
+        win.display();
+    }
+    else{
+        help_b = Mhelp.draw(win);
+    }
 }

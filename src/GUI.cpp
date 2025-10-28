@@ -1,4 +1,4 @@
-#include"simulador_dinamica.hpp"
+#include"simulator.hpp"
 
 #define text_def(A,B,C,D,E) A.setCharacterSize(20);A.setString(B);A.setFillColor(C);A.setPosition({D,E});
 #define df  (font)
@@ -7,16 +7,24 @@ bool add_obj_mov=false;
 std::string formatar(float valor,int casa=1,bool front=false) {
     std::ostringstream oss;
     if(front){
+        if((int)(valor*10)%10 == 0){
+            oss << std::fixed << '|'<<std::setprecision(0) << valor;
+        }else{
         oss << std::fixed << '|'<<std::setprecision(casa) << valor;
+        }
     }else{
+        if((int)(valor*10)%10 == 0){
+            oss << std::fixed <<std::setprecision(0) << valor;
+        }else{
         oss << std::fixed <<std::setprecision(casa) << valor;
+        }
     }
     return oss.str();
 }
 
 void Dinamica::menu(sf::RenderWindow &win){
     text= true;
-    sf::Text o df,c df,p df,pm df,b df,f df,v df,ac df,qm df,an df,k df,kat df,m df;
+    sf::Text o df,c df,p df,pm df,b df,f df,v df,ac df,qm df,an df,k df,kat df,m df,tipf df, help df;
     sf::RectangleShape space_menu({(float)win.getSize().x/3,(float)win.getSize().y});
     int8_t corptype=-1;
 
@@ -35,11 +43,10 @@ void Dinamica::menu(sf::RenderWindow &win){
     text_def(m,"mass: ",sf::Color::Black,0,160);
     text_def(kat,"K at: ",sf::Color::Black,0,180);
     text_def(k,"K el: ",sf::Color::Black,0,200);
+    text_def(tipf,"seg/t:",sf::Color::White,0,220);
+    text_def(help,"help?:",sf::Color::White,0,240);
 
-    if(corps.size()>16){
-        std::cout<<"Número máximo de objetos\n";
-    }
-    if( (add_obj_mov==true ||button_click(o) && selection==-1) &&corps.size()<=16){
+    if( (add_obj_mov==true ||button_click(o) && selection==-1) &&corps.size()<11){
         o.setString("QUIT");
         o.setPosition({0,200});
         add_obj_mov=true;
@@ -72,6 +79,9 @@ void Dinamica::menu(sf::RenderWindow &win){
                 //corps.back().defcord(win);
             }
         }
+        if(corps.size()==11){
+            std::cout<<"Número máximo de objetos\n";
+        }
     }
 
     for(int i=0; i < corps.size();i++){
@@ -81,6 +91,10 @@ void Dinamica::menu(sf::RenderWindow &win){
             }
         }
         corps[i].selected(win,false);
+    }
+
+    if(button_click(help)){
+        help_b=true;
     }
 
     win.draw(space_menu);
@@ -94,12 +108,20 @@ void Dinamica::menu(sf::RenderWindow &win){
         win.draw(m);
         win.draw(k);
         win.draw(kat);
+        win.draw(tipf);
+        win.draw(help);
     }else{
         win.draw(p);
         win.draw(pm);
         win.draw(b);
         win.draw(c);
         win.draw(o);
+    }
+
+    if(button_click(tipf) || g==9){
+            g=9;
+            d=false;
+            timeperframe=input(win,{80,220});
     }
 
     if(selection!=-1){
@@ -246,7 +268,7 @@ void Dinamica::infos(sf::RenderWindow &win) {
     std::vector<sf::Text> obj, speed, force, acel, qmov, e, ang, ke, kat;
 
     sf::RectangleShape space_infos;
-    space_infos.setSize({win.getSize().x / 3.f, win.getSize().y / 3.f});
+    space_infos.setSize({win.getSize().x / 3.f, win.getSize().y / 3.f+10});
     space_infos.setPosition({win.getSize().x - space_infos.getSize().x, 0.f});
     space_infos.setFillColor(sf::Color::Green);
     win.draw(space_infos);
@@ -262,38 +284,27 @@ void Dinamica::infos(sf::RenderWindow &win) {
     ke.emplace_back(font);
     kat.emplace_back(font);
 
-    text_def(obj.back(), "Ob:", sf::Color::Black, win.getSize().x * 2 / 3.f, 20.f);
-    text_def(speed.back(), "|V:", sf::Color::Black, win.getSize().x * 2 / 3.f + 18, 20.f);
-    text_def(force.back(), "|F:", sf::Color::Black, win.getSize().x * 2 / 3.f + 56, 20.f);
-    text_def(acel.back(), "|a:", sf::Color::Black, win.getSize().x * 2 / 3.f + 94, 20.f);
-    text_def(qmov.back(), "|Qm:", sf::Color::Black, win.getSize().x * 2 / 3.f + 132, 20.f);
-    text_def(e.back(), "|Ec:", sf::Color::Black, win.getSize().x * 2 / 3.f + 162, 20.f);
-    text_def(ke.back(), "|Ke:", sf::Color::Black, win.getSize().x * 2 / 3.f + 192, 20.f);
-    text_def(kat.back(), "|Ka:", sf::Color::Black, win.getSize().x * 2 / 3.f + 222, 20.f);
-    text_def(ang.back(), "|An", sf::Color::Black, win.getSize().x * 2 / 3.f + 252, 20.f);
+    text_def(obj.back(), "Ob:", sf::Color::Black,win.getSize().x * 2 / 3.f, 0.f);
+    text_def(speed.back(), "V:", sf::Color::Black,win.getSize().x * 2 / 3.f, 20.f);
+    text_def(force.back(), "F:", sf::Color::Black,win.getSize().x * 2 / 3.f, 50.f);
+    text_def(acel.back(), "a:", sf::Color::Black,win.getSize().x * 2 / 3.f, 80);
+    text_def(qmov.back(), "Qm:", sf::Color::Black,win.getSize().x * 2 / 3.f, 110);
+    text_def(e.back(), "Ec:", sf::Color::Black,win.getSize().x * 2 / 3.f, 130);
+    text_def(ke.back(), "Ke:", sf::Color::Black,win.getSize().x * 2 / 3.f, 150);
+    text_def(kat.back(), "Ka:", sf::Color::Black,win.getSize().x * 2 / 3.f, 170);
+    text_def(ang.back(), "An:", sf::Color::Black,win.getSize().x * 2 / 3.f, 190);
 
-    obj.back().setCharacterSize(9);
-    speed.back().setCharacterSize(9);
-    force.back().setCharacterSize(9);
-    acel.back().setCharacterSize(9);
-    qmov.back().setCharacterSize(9);
-    e.back().setCharacterSize(9);
-    ang.back().setCharacterSize(9);
-    ke.back().setCharacterSize(9);
-    kat.back().setCharacterSize(9);
 
-    // Desenhar cabeçalhos
-    win.draw(obj.back());
-    win.draw(speed.back());
-    win.draw(force.back());
-    win.draw(acel.back());
-    win.draw(qmov.back());
-    win.draw(e.back());
-    win.draw(ang.back());
-    win.draw(ke.back());
-    win.draw(kat.back());
+    obj.back().setCharacterSize(12);
+    speed.back().setCharacterSize(12);
+    force.back().setCharacterSize(12);
+    acel.back().setCharacterSize(12);
+    qmov.back().setCharacterSize(12);
+    e.back().setCharacterSize(12);
+    ang.back().setCharacterSize(12);
+    ke.back().setCharacterSize(12);
+    kat.back().setCharacterSize(12);
 
-    // Dados dos corpos
     for (int i = 0; i < corps.size(); i++) {
         obj.emplace_back(font);
         speed.emplace_back(font);
@@ -305,57 +316,38 @@ void Dinamica::infos(sf::RenderWindow &win) {
         ke.emplace_back(font);
         kat.emplace_back(font);
 
-        float y = 30.f+10*i;
-        float x = win.getSize().x * 2 / 3.f;
+        float y =0.f;
+        float x =(win.getSize().x * 2 / 3.f)+(20*(i+1));
 
-        text_def(obj.back(), std::to_string(i), sf::Color::Black, x, y);
-        obj.back().setCharacterSize(6);
+        text_def(obj.back(), "|"+std::to_string(i), sf::Color::Black, x, y);
+        text_def(speed.back(), formatar(corps[i].vel.x,1,1) + "\n" + formatar(corps[i].vel.y,1,1), sf::Color::Black, x, y+20);
+        text_def(force.back(), formatar(corps[i].force.x,1,1) + "\n" + formatar(corps[i].force.y,1,1), sf::Color::Black, x, y+50);
+        text_def(acel.back(), formatar(corps[i].acel.x,1,1) + "\n" + formatar(corps[i].acel.y,1,1), sf::Color::Black, x, y+80);
+        text_def(qmov.back(), formatar(corps[i].qmov,1,1), sf::Color::Black, x,y+110);
+        text_def(e.back(), formatar(corps[i].work,1,1), sf::Color::Black, x, y+130);
+        text_def(ke.back(), formatar(corps[i].k_el,1,1), sf::Color::Black, x, y+150);
+        text_def(kat.back(), formatar(corps[i].k_at,1,1), sf::Color::Black, x, y+170);
+        text_def(ang.back(), formatar(corps[i].ang,0,1), sf::Color::Black, x, y+190);
 
-        text_def(speed.back(), formatar(corps[i].vel.x,1,1) + ";" + formatar(corps[i].vel.y), sf::Color::Black, x+18, y);
-        speed.back().setCharacterSize(6);
-
-        text_def(force.back(), formatar(corps[i].force.x,1,1) + ";" + formatar(corps[i].force.y), sf::Color::Black, x + 56, y);
-        force.back().setCharacterSize(6);
-
-        text_def(acel.back(), formatar(corps[i].acel.x,1,1) + ";" + formatar(corps[i].acel.y), sf::Color::Black, x + 94, y);
-        acel.back().setCharacterSize(6);
-
-        text_def(qmov.back(), formatar(corps[i].qmov,1,1), sf::Color::Black, x + 132,y);
-        qmov.back().setCharacterSize(6);
-
-        text_def(e.back(), formatar(corps[i].work,1,1), sf::Color::Black, x + 162, y);
-        e.back().setCharacterSize(6);
-
-        text_def(ke.back(), formatar(corps[i].k_el,1,1), sf::Color::Black, x + 192, y);
-        ke.back().setCharacterSize(6);
-
-        text_def(kat.back(), formatar(corps[i].k_at,1,1), sf::Color::Black, x + 222, y);
-        kat.back().setCharacterSize(6);
-
-        text_def(ang.back(), formatar(corps[i].ang,0,1), sf::Color::Black, x + 252, y);
-        ang.back().setCharacterSize(6);
-
-        // Desenhar linha de dados
-        win.draw(obj.back());
-        win.draw(speed.back());
-        win.draw(force.back());
-        win.draw(acel.back());
-        win.draw(qmov.back());
-        win.draw(e.back());
-        win.draw(ang.back());
-        win.draw(ke.back());
-        win.draw(kat.back());
+        obj.back().setCharacterSize(11);
+        speed.back().setCharacterSize(11);
+        force.back().setCharacterSize(11);
+        acel.back().setCharacterSize(11);
+        qmov.back().setCharacterSize(11);
+        e.back().setCharacterSize(11);
+        ang.back().setCharacterSize(11);
+        ke.back().setCharacterSize(11);
+        kat.back().setCharacterSize(11);
     }
-
-
-    // Limpar vetores
-    obj.clear();
-    speed.clear();
-    force.clear();
-    acel.clear();
-    qmov.clear();
-    e.clear();
-    ang.clear();
-    ke.clear();
-    kat.clear();
+    for(int i=0; i<= corps.size();i++){
+        win.draw(obj[i]);
+        win.draw(speed[i]);
+        win.draw(force[i]);
+        win.draw(acel[i]);
+        win.draw(qmov[i]);
+        win.draw(e[i]);
+        win.draw(ang[i]);
+        win.draw(ke[i]);
+        win.draw(kat[i]);
+    }
 }

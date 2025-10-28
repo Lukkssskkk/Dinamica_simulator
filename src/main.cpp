@@ -1,4 +1,4 @@
-#include"simulador_dinamica.hpp"
+#include"simulator.hpp"
 
 int main(){
     sf::RenderWindow window(sf::VideoMode({800,600}),"Simulador de Dinamica");

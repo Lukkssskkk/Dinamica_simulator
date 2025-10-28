@@ -1,4 +1,4 @@
-#include"simulador_dinamica.hpp"
+#include"simulator.hpp"
 
 Corp::Corp(int i){
     if(i==0){
@@ -36,37 +36,42 @@ Corp::Corp(int i){
     mass=0.0;
     k_el=0.0;
     k_at=0.0;
+    k_ata=0.0;
+    k_ela=0.0;
     qmov=0.0;
     work=0.0;
     power=0.0;
     k_col=0.0;
 }
 
-/*
-void Corp::run(sf::RenderWindow &win){
-    if(type==0){            //square
-    F();
-    Fat();
-    Fel();
-    Qmovimento();
-    Work_calc();
-    Power_Calc();
-    vel_calc();
-    acel_calc();
-    dist_calc();
-    colisao_calc();
-    colision();
+
+void Corp::run(){
+    //Power_Calc();
+    if(force.x!=0 && force.y!=0){
+        force.x -=force.y*k_ata;
     }
-    else if(type==1){       //polia_fixa
-    polia_fixa();
-    }else if(type==2){      //polia_movel
-    polia_movel();
+    if(force.x != 0.0 || force.y != 0.0){
+        qmov = sqrt(
+        (force.x*(shape.getPosition().x - origin.x))*(force.x*(shape.getPosition().x - origin.x)) 
+        +
+        (force.y*(shape.getPosition().y - origin.y))*(force.y*(shape.getPosition().y - origin.y))
+        );  //Qmov = F.d;
     }
-    else if(type==3){
-        corda();            //corda
+    if(mass!=0){
+        acel.x = force.x/mass;  // a=F/m ou F=ma;
+        acel.y = force.y/mass;
     }
+    if(acel.x!=0.0 || acel.y!=0.0){
+        vel=vel+acel;   //V = v+ at(segundo)
+    }
+    if(vel.x != 0){
+        L = force.x*k_ela;   //Fel = k.x -> x = Fel/k
+        //vel.x=sqrt(2*k_ela*L*L/m);                   //mv²/2=kx² -> v= sqrt(2kx²/m)
+    }
+
+    shape.setPosition({shape.getPosition().x+vel.x/100,shape.getPosition().y+vel.y/100});
 }
-*/
+
 
 void Corp::draw(sf::RenderWindow &win){
     if(type==0 || type==3){
