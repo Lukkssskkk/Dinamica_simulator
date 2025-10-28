@@ -1,160 +1,119 @@
 #include"simulador_dinamica.hpp"
 
+#define text_def(A,B,C,D,E) A.setCharacterSize(20);A.setString(B);A.setFillColor(C);A.setPosition({D,E});
+#define df  (font)
+bool add_obj_mov=false;
+
+std::string formatar(float valor,int casa=1,bool front=false) {
+    std::ostringstream oss;
+    if(front){
+        oss << std::fixed << '|'<<std::setprecision(casa) << valor;
+    }else{
+        oss << std::fixed <<std::setprecision(casa) << valor;
+    }
+    return oss.str();
+}
+
 void Dinamica::menu(sf::RenderWindow &win){
-    sf::Text obj_t(font),cord_s(font),polia_s(font),poliam_s(font),block(font),force_t(font),vel_t(font),acel_t(font),qmov_t(font),ang_t(font),kel_t(font),kat_t(font),mass_t(font);
-    sf::RectangleShape selection_s,space_menu;
-    //Select object:
-    selection_s.setSize({60.f,60.f});
-    selection_s.setFillColor(sf::Color::Black);
-    selection_s.setOrigin({30.f,30.f});
-    //MENU BOX:
+    text= true;
+    sf::Text o df,c df,p df,pm df,b df,f df,v df,ac df,qm df,an df,k df,kat df,m df;
+    sf::RectangleShape space_menu({(float)win.getSize().x/3,(float)win.getSize().y});
+    int8_t corptype=-1;
+
     space_menu.setPosition({0.f,0.f});
     space_menu.setFillColor(sf::Color::Blue);
-    space_menu.setSize({win.getSize().x/3,win.getSize().y});
-    //add OBJ button:
-    obj_t.setCharacterSize(20);
-    obj_t.setString("\n\n+OBJ");
-    obj_t.setFillColor(sf::Color::White);
-    //add block sub button de OBJ:
-    block.setCharacterSize(20);
-    block.setString("\n\n\n+Block");
-    block.setFillColor(sf::Color::White);
-    //add cord sub button de OBJ:
-    cord_s.setCharacterSize(20);
-    cord_s.setString("\n\n\n\n+Cord");
-    cord_s.setFillColor(sf::Color::White);
-    //add polia fixa sub button de OBJ:
-    polia_s.setCharacterSize(20);
-    polia_s.setString("\n\n\n\n\n+Polia_fixa");
-    polia_s.setFillColor(sf::Color::White);
-    //add polia movel sub button de OBJ:
-    poliam_s.setCharacterSize(20);
-    poliam_s.setString("\n\n\n\n\n\n+Polia_movel");
-    poliam_s.setFillColor(sf::Color::White);
-    //defina força de um bloco de acordo com x e y:
-    force_t.setCharacterSize(20);
-    force_t.setString("\n\n\nF:");
-    force_t.setFillColor(sf::Color::Black);
-    //defina velocidade de um bloco de acordo com x e y:
-    vel_t.setCharacterSize(20);
-    vel_t.setString("\n\n\n\nV:");
-    vel_t.setFillColor(sf::Color::Black);
-    //defina aceleração de um bloco de acordo com x e y:
-    acel_t.setCharacterSize(20);
-    acel_t.setString("\n\n\n\n\na:");
-    acel_t.setFillColor(sf::Color::Black);
-    //defina quantidade de movimento:
-    qmov_t.setCharacterSize(20);
-    qmov_t.setString("\n\n\n\n\n\nQm:");
-    qmov_t.setFillColor(sf::Color::Black);
-    //defina angulo
-    ang_t.setCharacterSize(20);
-    ang_t.setString("\n\n\n\n\n\n\ngraus:");
-    ang_t.setFillColor(sf::Color::Black);
-    //defina massa
-    mass_t.setCharacterSize(20);
-    mass_t.setString("\n\n\n\n\n\n\n\nm:");
-    mass_t.setFillColor(sf::Color::Black);
-    //defina atrito
-    kat_t.setCharacterSize(20);
-    kat_t.setString("\n\n\n\n\n\n\n\n\nk_at:");
-    kat_t.setFillColor(sf::Color::Black);
-    //defina elasticidade
-    kel_t.setCharacterSize(20);
-    kel_t.setString("\n\n\n\n\n\n\n\n\n\nk_el:");
-    kel_t.setFillColor(sf::Color::Black);
+    text_def(o,"add OBJ",sf::Color::White,0,40);
+    text_def(b,"add block",sf::Color::White,0,60);
+    text_def(c,"add Line",sf::Color::White,0,100);
+    text_def(p,"add Polia",sf::Color::White,0,120);
+    text_def(pm,"add Polia movel",sf::Color::White,0,140);
+    text_def(f,"force:",sf::Color::Black,0,60);
+    text_def(v,"speed:",sf::Color::Black,0,80);
+    text_def(ac,"acel: ",sf::Color::Black,0,100);
+    text_def(qm,"Qmov: ",sf::Color::Black,0,120);
+    text_def(an,"angle:",sf::Color::Black,0,140);
+    text_def(m,"mass: ",sf::Color::Black,0,160);
+    text_def(kat,"K at: ",sf::Color::Black,0,180);
+    text_def(k,"K el: ",sf::Color::Black,0,200);
 
-    if(add_obj_mov==true){
-            obj_t.setString("\n\nQUIT");
-        
-        if(button_click(obj_t)){
-            add_obj_mov=false;
-        }
-        else{
-            if(button_click(block)){
-                Corp corp(0);
-                corps.push_back(corp);
-                corp_type=0;
-            }else if(button_click(cord_s)){
-                std::cout << "add cord\n";
-                Corp corp(3);
-                corps.push_back(corp);
-                corp_type=3;
-            }else if(button_click(polia_s)){
-                Corp corp(1);
-                std::cout << "add polia fixa\n";
-                corps.push_back(corp);
-                corp_type=1;
-            }else if(button_click(poliam_s)){
-                std::cout << "add polia movel\n";
-                Corp corp(2);
-                corps.push_back(corp);
-                corp_type=2;
-            }
-        }
-        if(corp_type!=-1){
-            add_obj_mov=false;
-            if(corp_type==0){
-                corps.back().shape.setPosition({space_sim.getSize().x/2, space_sim.getSize().y/2});
-            }else if(corp_type==1 || corp_type==2){
-                corps.back().shape_p.setPosition({space_sim.getSize().x/2, space_sim.getSize().y/2});
-            }else{
-                //
-            }
-        }
+    if(corps.size()>16){
+        std::cout<<"Número máximo de objetos\n";
     }
-    else if(button_click(obj_t)){
+    if( (add_obj_mov==true ||button_click(o) && selection==-1) &&corps.size()<=16){
+        o.setString("QUIT");
+        o.setPosition({0,200});
         add_obj_mov=true;
-        corp_type=-1;
+        
+        if(button_click(o)){
+            add_obj_mov=false;
+        }
+        else if(button_click(b)){
+            Corp corp(0);
+            corptype=0;
+            corps.push_back(corp);
+        }else if(button_click(c)){
+            Corp corp(3);
+            corptype=3;
+            corps.push_back(corp);
+        }else if(button_click(p)){
+            Corp corp(1);
+            corptype=1;
+            corps.push_back(corp);
+        }else if(button_click(pm)){
+            Corp corp(2);
+            corptype=2;
+            corps.push_back(corp);
+        }
+        if(corptype!=-1){
+            add_obj_mov=false;
+            corps.back().shape.setPosition({(float)win.getSize().x/2,(float)win.getSize().y/2});
+            corps.back().shape_p.setPosition({(float)win.getSize().x/2,(float)win.getSize().y/2});
+            if(corps.back().type == 3){
+                //corps.back().defcord(win);
+            }
+        }
     }
 
     for(int i=0; i < corps.size();i++){
-        if(button_click(corps[i].shape)){
+        if(button_click(corps[i].shape) || button_click(corps[i].shape_p)){
             if(selection!=i){
                 selection=i;
-                selection_s.setPosition(corps[i].shape.getPosition());
             }
         }
-        else if(button_click(corps[i].shape_p)){
-            if(selection!=i){
-                selection=i;
-                selection_s.setPosition(corps[i].shape.getPosition());
-            }
-        }
-    }
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)){
-                selection=-1;
+        corps[i].selected(win,false);
     }
 
     win.draw(space_menu);
     if(add_obj_mov==false){
-    win.draw(obj_t);
-    win.draw(force_t);
-    win.draw(vel_t);
-    win.draw(acel_t);
-    win.draw(ang_t);
-    win.draw(qmov_t);
-    win.draw(mass_t);
-    win.draw(kel_t);
-    win.draw(kat_t);
+        win.draw(o);
+        win.draw(f);
+        win.draw(v);
+        win.draw(ac);
+        win.draw(an);
+        win.draw(qm);
+        win.draw(m);
+        win.draw(k);
+        win.draw(kat);
     }else{
-        win.draw(polia_s);
-        win.draw(poliam_s);
-        win.draw(block);
-        win.draw(cord_s);
-        win.draw(obj_t);
+        win.draw(p);
+        win.draw(pm);
+        win.draw(b);
+        win.draw(c);
+        win.draw(o);
     }
+
     if(selection!=-1){
-        win.draw(selection_s);
-        obj_t.setFillColor(sf::Color::Black);
-        acel_t.setFillColor(sf::Color::White);
-        qmov_t.setFillColor(sf::Color::White);
-        mass_t.setFillColor(sf::Color::White);
-        kel_t.setFillColor(sf::Color::White);
-        kat_t.setFillColor(sf::Color::White);
-        vel_t.setFillColor(sf::Color::White);
-        force_t.setFillColor(sf::Color::White);
-        ang_t.setFillColor(sf::Color::White);
+        corps[selection].selected(win,true);
+
+        o.setFillColor(sf::Color::Black);
+        ac.setFillColor(sf::Color::White);
+        qm.setFillColor(sf::Color::White);
+        m.setFillColor(sf::Color::White);
+        k.setFillColor(sf::Color::White);
+        kat.setFillColor(sf::Color::White);
+        v.setFillColor(sf::Color::White);
+        f.setFillColor(sf::Color::White);
+        an.setFillColor(sf::Color::White);
         if(mouse.getGlobalBounds().findIntersection(corps[selection].shape.getGlobalBounds()) && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
             editpos(selection);
         }
@@ -162,65 +121,57 @@ void Dinamica::menu(sf::RenderWindow &win){
             editpos(selection);
         }
 
-        if(button_click(force_t) || gf==true){
-            text=true;
-            gf=true;
+        if(button_click(f) || g==1){
+            g=1;
             d=true;
-            corps[selection].force=m_input(win,{60,60},&gf);
+            corps[selection].force=m_input(win,{80,60});
         }
-        else if(button_click(vel_t) || gv==true){
-            text=true;
-            gv=true;
+        else if(button_click(v) || g==2){
+            g=2;
             d=true;
-            corps[selection].vel=m_input(win,{60,80},&gv);
+            corps[selection].vel=m_input(win,{80,80});
         }
-        else if(button_click(acel_t) || ga==true){
-            text=true;
-            ga=true;
+        else if(button_click(ac) || g==3){
+            g=3;
             d=true;
-            corps[selection].acel=m_input(win,{60,100},&ga);
+            corps[selection].acel=m_input(win,{80,100});
         }
-        else if(button_click(qmov_t)|| gqmov==true){
-            text=true;
-            gqmov=true;
+        else if(button_click(qm)|| g==4){
+            g=4;
             d=false;
-            corps[selection].qmov=input(win,{60,120},&gqmov);
+            corps[selection].qmov=input(win,{80,120});
         }
-        else if(button_click(ang_t) || gan==true){
-            text=true;
-            gan=true;
+        else if(button_click(an) || g==5){
+            g=5;
             d=false;
-            corps[selection].ang=input(win,{60,140},&gan);
+            corps[selection].ang=input(win,{80,140});
         }
-        else if(button_click(mass_t) || gm==true){
-            gm=true;
-            text=true;
+        else if(button_click(m) || g==6){
+            g=6;
             d=false;
-            corps[selection].mass=input(win,{60,160},&gm);
+            corps[selection].mass=input(win,{80,180});
         }
-        else if(button_click(kat_t) || gkat==true){
-            text=true;
-            gkat=true;
+        else if(button_click(kat) || g==7){
+            g=7;
             d=false;
-            corps[selection].k_at=input(win,{60,180},&gkat);
+            corps[selection].k_at=input(win,{80,180});
         }
-        else if(button_click(kel_t) || gkel==true){
-            text=true;
-            gkel=true;
+        else if(button_click(k) || g==8){
+            g=8;
             d=false;
-            corps[selection].k_el=input(win,{60,200},&gkel);
+            corps[selection].k_el=input(win,{80,200});
+        }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)){
+            selection=-1;
         }
     }
 }
 
-float Dinamica::input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
-    std::string texto;
-    sf::RectangleShape shape({80,20});
-    sf::Text texto_sf(font);
-    texto_sf.setCharacterSize(20);
-    texto_sf.setPosition({pos.x,pos.y});
+float Dinamica::input(sf::RenderWindow &win,sf::Vector2f pos){
+    sf::RectangleShape shape({120,20});
+    sf::Text texto_sf df;
+    text_def(texto_sf,"",sf::Color::Black,pos.x,pos.y);
     shape.setPosition(pos);
-    texto_sf.setFillColor(sf::Color::Black);
     shape.setFillColor(sf::Color::White);
 
     if(text) {
@@ -229,7 +180,7 @@ float Dinamica::input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
         win.draw(texto_sf);
     }
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)){
-        *x=false;
+        g=-1;
     }
 
     try {
@@ -240,19 +191,14 @@ float Dinamica::input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
     
 }
 
-sf::Vector2f Dinamica::m_input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
+sf::Vector2f Dinamica::m_input(sf::RenderWindow &win,sf::Vector2f pos){
     sf::Vector2f ret;
-    sf::RectangleShape shape({80,20});
-    sf::Text texto_sf(font),is_xory(font);
-    texto_sf.setCharacterSize(20);
-    texto_sf.setPosition({pos.x+20,pos.y});
-    is_xory.setCharacterSize(20);
-    is_xory.setPosition(pos);
-    is_xory.setString("X:");
-    is_xory.setFillColor(sf::Color::Black);
+    sf::RectangleShape shape({120,20});
     shape.setPosition(pos);
-    texto_sf.setFillColor(sf::Color::Black);
     shape.setFillColor(sf::Color::White);
+    sf::Text texto_sf df,is_xory df;
+    text_def(texto_sf,"",sf::Color::Black,pos.x+20,pos.y);
+    text_def(is_xory,"X:",sf::Color::Black,pos.x,pos.y)
 
     if(text) {
         texto_sf.setString(input_text);
@@ -266,10 +212,9 @@ sf::Vector2f Dinamica::m_input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
     } catch (...) {
         ret.x = 0.f;
     }
-
-    text=true;
     
     if(f==false){
+        text=true;
         is_xory.setString("Y:");
         if(text) {
             texto_sf.setString(input_text);
@@ -283,29 +228,134 @@ sf::Vector2f Dinamica::m_input(sf::RenderWindow &win,sf::Vector2f pos,bool *x){
             ret.y = 0.f;
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Enter)){
-            *x=false;
+            g=-1;
         }
     }
     return ret;
 }
 
 void Dinamica::editpos(int x){
-    if(corps[selection].type==0){
+    if(corps[selection].type==0 || corps[selection].type==3){
         corps[selection].shape.setPosition(mouse.getPosition());
-        if(button_click(corps[selection].shape)){
-        }
-    }else if(corps[selection].type!=3){
+    }else{
         corps[selection].shape_p.setPosition(mouse.getPosition());
-        if(button_click(corps[selection].shape_p)){
-        }
     }
 }
 
-void Dinamica::infos(sf::RenderWindow &win){
-    sf::Text obj(font),obj_speed(font),obj_force(font),obj_acel(font),obj_qmov(font),obj_e(font),obj_angulation(font);
-    
-    space_infos.setSize({win.getSize().x / 4.f, win.getSize().y / 2.f});
+void Dinamica::infos(sf::RenderWindow &win) {
+    std::vector<sf::Text> obj, speed, force, acel, qmov, e, ang, ke, kat;
+
+    sf::RectangleShape space_infos;
+    space_infos.setSize({win.getSize().x / 3.f, win.getSize().y / 3.f});
     space_infos.setPosition({win.getSize().x - space_infos.getSize().x, 0.f});
     space_infos.setFillColor(sf::Color::Green);
     win.draw(space_infos);
+
+    // Cabeçalhos
+    obj.emplace_back(font);
+    speed.emplace_back(font);
+    force.emplace_back(font);
+    acel.emplace_back(font);
+    qmov.emplace_back(font);
+    e.emplace_back(font);
+    ang.emplace_back(font);
+    ke.emplace_back(font);
+    kat.emplace_back(font);
+
+    text_def(obj.back(), "Ob:", sf::Color::Black, win.getSize().x * 2 / 3.f, 20.f);
+    text_def(speed.back(), "|V:", sf::Color::Black, win.getSize().x * 2 / 3.f + 18, 20.f);
+    text_def(force.back(), "|F:", sf::Color::Black, win.getSize().x * 2 / 3.f + 56, 20.f);
+    text_def(acel.back(), "|a:", sf::Color::Black, win.getSize().x * 2 / 3.f + 94, 20.f);
+    text_def(qmov.back(), "|Qm:", sf::Color::Black, win.getSize().x * 2 / 3.f + 132, 20.f);
+    text_def(e.back(), "|Ec:", sf::Color::Black, win.getSize().x * 2 / 3.f + 162, 20.f);
+    text_def(ke.back(), "|Ke:", sf::Color::Black, win.getSize().x * 2 / 3.f + 192, 20.f);
+    text_def(kat.back(), "|Ka:", sf::Color::Black, win.getSize().x * 2 / 3.f + 222, 20.f);
+    text_def(ang.back(), "|An", sf::Color::Black, win.getSize().x * 2 / 3.f + 252, 20.f);
+
+    obj.back().setCharacterSize(9);
+    speed.back().setCharacterSize(9);
+    force.back().setCharacterSize(9);
+    acel.back().setCharacterSize(9);
+    qmov.back().setCharacterSize(9);
+    e.back().setCharacterSize(9);
+    ang.back().setCharacterSize(9);
+    ke.back().setCharacterSize(9);
+    kat.back().setCharacterSize(9);
+
+    // Desenhar cabeçalhos
+    win.draw(obj.back());
+    win.draw(speed.back());
+    win.draw(force.back());
+    win.draw(acel.back());
+    win.draw(qmov.back());
+    win.draw(e.back());
+    win.draw(ang.back());
+    win.draw(ke.back());
+    win.draw(kat.back());
+
+    // Dados dos corpos
+    for (int i = 0; i < corps.size(); i++) {
+        obj.emplace_back(font);
+        speed.emplace_back(font);
+        force.emplace_back(font);
+        acel.emplace_back(font);
+        qmov.emplace_back(font);
+        e.emplace_back(font);
+        ang.emplace_back(font);
+        ke.emplace_back(font);
+        kat.emplace_back(font);
+
+        float y = 30.f+10*i;
+        float x = win.getSize().x * 2 / 3.f;
+
+        text_def(obj.back(), std::to_string(i), sf::Color::Black, x, y);
+        obj.back().setCharacterSize(6);
+
+        text_def(speed.back(), formatar(corps[i].vel.x,1,1) + ";" + formatar(corps[i].vel.y), sf::Color::Black, x+18, y);
+        speed.back().setCharacterSize(6);
+
+        text_def(force.back(), formatar(corps[i].force.x,1,1) + ";" + formatar(corps[i].force.y), sf::Color::Black, x + 56, y);
+        force.back().setCharacterSize(6);
+
+        text_def(acel.back(), formatar(corps[i].acel.x,1,1) + ";" + formatar(corps[i].acel.y), sf::Color::Black, x + 94, y);
+        acel.back().setCharacterSize(6);
+
+        text_def(qmov.back(), formatar(corps[i].qmov,1,1), sf::Color::Black, x + 132,y);
+        qmov.back().setCharacterSize(6);
+
+        text_def(e.back(), formatar(corps[i].work,1,1), sf::Color::Black, x + 162, y);
+        e.back().setCharacterSize(6);
+
+        text_def(ke.back(), formatar(corps[i].k_el,1,1), sf::Color::Black, x + 192, y);
+        ke.back().setCharacterSize(6);
+
+        text_def(kat.back(), formatar(corps[i].k_at,1,1), sf::Color::Black, x + 222, y);
+        kat.back().setCharacterSize(6);
+
+        text_def(ang.back(), formatar(corps[i].ang,0,1), sf::Color::Black, x + 252, y);
+        ang.back().setCharacterSize(6);
+
+        // Desenhar linha de dados
+        win.draw(obj.back());
+        win.draw(speed.back());
+        win.draw(force.back());
+        win.draw(acel.back());
+        win.draw(qmov.back());
+        win.draw(e.back());
+        win.draw(ang.back());
+        win.draw(ke.back());
+        win.draw(kat.back());
+    }
+
+
+    // Limpar vetores
+    obj.clear();
+    speed.clear();
+    force.clear();
+    acel.clear();
+    qmov.clear();
+    e.clear();
+    ang.clear();
+    ke.clear();
+    kat.clear();
 }

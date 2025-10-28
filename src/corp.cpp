@@ -75,3 +75,25 @@ void Corp::draw(sf::RenderWindow &win){
         win.draw(shape_p);
     }
 }
+
+void Corp::selected(sf::RenderWindow &win,bool x){
+    if(x == true){
+        if(type ==0 || type==3){
+            shape.setOutlineColor(sf::Color::Black);
+            shape.setOutlineThickness(5.f);
+        }
+        else if(type==1 || type==2){
+            shape_p.setOutlineColor(sf::Color::Black);
+            shape_p.setOutlineThickness(5.f);
+        }
+    }else{
+        if(type ==0 || type==3){
+            shape.setOutlineColor(sf::Color::Black);
+            shape.setOutlineThickness(0.f);
+        }
+        else if(type==1 || type==2){
+            shape_p.setOutlineColor(sf::Color::Black);
+            shape_p.setOutlineThickness(0.f);
+        }
+    }
+}

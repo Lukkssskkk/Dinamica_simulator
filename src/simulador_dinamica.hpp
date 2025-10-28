@@ -6,6 +6,8 @@
 #include<iostream>
 #include<cmath>
 #include<vector>
+#include <iomanip>
+#include <sstream>
 
 #define button_click(B) (mouse.getGlobalBounds().findIntersection(B.getGlobalBounds()) && isclicked==true)
 
@@ -14,6 +16,8 @@ class Corp{
     Corp(int i);
     void run(sf::RenderWindow &win);
     void draw(sf::RenderWindow &win);
+    void selected(sf::RenderWindow &win,bool x);
+    void defcord(sf::RenderWindow &win);
 
     sf::RectangleShape shape;
     sf::CircleShape shape_p;
@@ -24,7 +28,6 @@ class Corp{
 
     private:
 
-    //Calculo:
     float F();
     float Fat();
     float Fel();
@@ -41,40 +44,29 @@ class Corp{
     float corda();
 };
 
-
 class Dinamica{
     public:
         Dinamica(float x,float y);
         void run(sf::RenderWindow &window);
     private:
-        unsigned int selection;
-        bool isclicked,infos_act,menu_act,sim_act,add_obj_mov,start,text;
-        bool ga,gm,gv,gf,gan,gkel,gkat,gqmov,gwork,f,d;
+        int8_t selection,g,s;
+        bool isclicked,text,f,d;
         float timeperframe;
-        int corp_type;
 
         std::string input_text;
-        sf::RectangleShape mouse,startsm,form_info;
+        sf::RectangleShape mouse,startsm,reset_button,button_info,button_menu;
         std::vector<Corp> corps;
-        sf::RectangleShape button_info,button_menu;
-        std::vector<sf::RectangleShape> inputs;
-        sf::RectangleShape space_sim,space_infos;
-        std::vector<sf::Text> texts;
         sf::Texture info_t,menu_t;
         sf::Font font;
         sf::Clock time;
 
         //GUI:
-        float input(sf::RenderWindow &win,sf::Vector2f pos,bool *x);
-        sf::Vector2f m_input(sf::RenderWindow &win,sf::Vector2f pos,bool *x);
+        float input(sf::RenderWindow &win,sf::Vector2f pos);
+        sf::Vector2f m_input(sf::RenderWindow &win,sf::Vector2f pos);
         void menu(sf::RenderWindow &win);
         void infos(sf::RenderWindow &win);
         void editpos(int x);
-
         //Funções padrões:
         void processEvents(sf::RenderWindow &win);
         void Draw(sf::RenderWindow &win);
-
-        //Nucleo do simulador:
-        void Simulator(sf::RenderWindow &win);
 };
