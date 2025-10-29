@@ -32,44 +32,28 @@ Corp::Corp(int i){
     acel.y=0.0;
     force.x=0.0;
     force.y=0.0;
-    //angle.asDegrees(sf::Angle::asDegrees(0.0));
+    angle=sf::degrees(0.f);
     mass=0.0;
     k_el=0.0;
     k_at=0.0;
     k_ata=0.0;
     k_ela=0.0;
-    qmov=0.0;
     work=0.0;
-    power=0.0;
-    k_col=0.0;
 }
 
 
 void Corp::run(){
-    //Power_Calc();
-    if(force.x!=0 && force.y!=0){
-        force.x -=force.y*k_ata;
+    if(type ==0 || type ==3){
+        shape.setRotation(angle);
     }
-    if(force.x != 0.0 || force.y != 0.0){
-        qmov = sqrt(
-        (force.x*(shape.getPosition().x - origin.x))*(force.x*(shape.getPosition().x - origin.x)) 
-        +
-        (force.y*(shape.getPosition().y - origin.y))*(force.y*(shape.getPosition().y - origin.y))
-        );  //Qmov = F.d;
-    }
-    if(mass!=0){
-        acel.x = force.x/mass;  // a=F/m ou F=ma;
-        acel.y = force.y/mass;
-    }
-    if(acel.x!=0.0 || acel.y!=0.0){
-        vel=vel+acel;   //V = v+ at(segundo)
-    }
-    if(vel.x != 0){
-        L = force.x*k_ela;   //Fel = k.x -> x = Fel/k
-        //vel.x=sqrt(2*k_ela*L*L/m);                   //mv²/2=kx² -> v= sqrt(2kx²/m)
-    }
-
-    shape.setPosition({shape.getPosition().x+vel.x/100,shape.getPosition().y+vel.y/100});
+    Work_calc();
+    Fat();
+    Fel();
+    F();
+    acel_calc();
+    vel_calc();
+    dist_calc();
+    
 }
 
 
@@ -102,3 +86,44 @@ void Corp::selected(sf::RenderWindow &win,bool x){
         }
     }
 }
+
+void Corp::Work_calc(){
+    if(force.x != 0.0 || force.y != 0.0){
+        work = sqrt(
+        (force.x*(shape.getPosition().x - origin.x))*(force.x*(shape.getPosition().x - origin.x)) 
+        +
+        (force.y*(shape.getPosition().y - origin.y))*(force.y*(shape.getPosition().y - origin.y))
+        );  //W = F.d;
+    }
+}
+void Corp::F(){
+    force.x=acel.x*mass;
+    force.y=acel.x*mass;
+}
+void Corp::Fat(){
+    if(force.x!=0 && force.y!=0){
+        force.x -=force.y*k_ata;
+    }
+}
+void Corp::Fel(){
+    if(vel.x != 0){
+        L = force.x*k_ela;   //Fel = k.x -> x = Fel/k
+        //vel.x=sqrt(2*k_ela*L*L/m);                   //mv²/2=kx² -> v= sqrt(2kx²/m)
+    }
+}
+void Corp::acel_calc(){
+    if(mass!=0){
+        acel.x = force.x/mass;  // a=F/m ou F=ma;
+        acel.y = force.y/mass;
+    }
+}
+void Corp::vel_calc(){
+    if(acel.x!=0.0 || acel.y!=0.0){
+        vel=vel+acel;   //V = v+ at(segundo)
+    }
+    
+}
+void Corp::dist_calc(){
+    shape.setPosition({shape.getPosition().x+vel.x/10,shape.getPosition().y+vel.y/10});
+}
+//float Corp::polia(){}

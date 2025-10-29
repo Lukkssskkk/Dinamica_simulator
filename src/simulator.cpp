@@ -28,13 +28,14 @@ Dinamica::Dinamica(float x, float y){
     reset_button.setFillColor(sf::Color::Red);
     reset_button.setPosition({x/2+20.f,0.f});
     //VARS:
+    d=false;
     isclicked=false;
     timeperframe=1.f;
     s=0;
     selection=-1;
     text=false;
     g=-1;
-    f=true;
+    fo=true;
     help_b=false;
     start_b=false;
     restart_b=false;
@@ -78,24 +79,35 @@ void Dinamica::processEvents(sf::RenderWindow &win){
                 if(text){
                     input_text.clear();
                     text=false;
-                    if (d) {
-                        f = !f;
+                    if(d){
+                    fo = !fo;
                     }
-
                 }
             }
         }
     }
 }
 
-
-
 void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
-
     if(!help_b){
         win.clear(sf::Color::White);
         float tr = time_pf.restart().asSeconds();
-        ts += tr/timeperframe;
+        ts += ts/timeperframe;
+        for(int i=0;i<corps.size();i++){
+            if(restart_b){
+                start_b=false;
+                corps[i].shape.setPosition(corps[i].origin);
+            }
+            else if(!start_b){
+                corps[i].origin=corps[i].shape.getPosition();
+            }
+            else if (ts >= 1.0f) {
+                corps[i].run();
+                ts = 0.0f;
+            }
+            corps[i].draw(win);
+        }
+
         if(button_click(button_menu) && s!=1){
             s=1;
         }
@@ -119,20 +131,6 @@ void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
             menu(win);
         }
 
-        
-        for(int i=0;i<corps.size();i++){
-            if (ts >= 1.0f && start_b) {
-                corps[i].run();
-                ts = 0.0f;
-            }if(restart_b){
-                corps[i].shape.setPosition(corps[i].origin);
-            }
-            if(!start_b){
-                corps[i].origin=corps[i].shape.getPosition();
-            }
-            corps[i].draw(win);
-        }
-
         win.draw(button_info);
         win.draw(button_menu);
         win.draw(startsm);
@@ -141,5 +139,21 @@ void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
     }
     else{
         help_b = Mhelp.draw(win);
+    }
+}
+
+void Dinamica::colision(sf::RenderWindow &win){
+    for(int i=0; i < corps.size();i++){
+        for(int j=0; j < corps.size();j++){
+            if(corps[i].shape.getGlobalBounds().findIntersection(corps[j].shape.getGlobalBounds())){
+                corps[i].vel={0.f,0.f};
+                corps[i].force={0.f,0.f};
+                corps[i].acel={0.f,0.f};
+
+                corps[j].vel={0.f,0.f};
+                corps[j].force={0.f,0.f};
+                corps[j].acel={0.f,0.f};
+            }
+        }
     }
 }
