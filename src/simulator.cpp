@@ -9,6 +9,10 @@ Dinamica::Dinamica(float x, float y){
     //Textures:
     if(info_t.loadFromFile("../img/info.png")){std::cout<<"info texture imported\n";}
     if(menu_t.loadFromFile("../img/menu.png")){std::cout<<"menu texture imported\n";}
+    if(start_t1.loadFromFile("../img/start.png")){std::cout<<"start texture imported\n";}
+    if(start_t2.loadFromFile("../img/pause.png")){std::cout<<"pause texture imported\n";}
+    if(restart_t1.loadFromFile("../img/restart.png")){std::cout<<"restart texture imported\n";}
+    if(restart_t2.loadFromFile("../img/restart_clicked.png")){std::cout<<"restart clicked texture imported\n";}
     //mouse:
     mouse.setSize({1,1});
     //Button menu:
@@ -21,11 +25,11 @@ Dinamica::Dinamica(float x, float y){
     button_info.setPosition({x-25.f,0.f});
     //Button start:
     startsm.setSize({25.f,25.f});
-    startsm.setFillColor(sf::Color::Blue);
+    startsm.setTexture(&start_t1);
     startsm.setPosition({x/2-12.5f,0.f});
     //Button Restart:
     reset_button.setSize({25.f,25.f});
-    reset_button.setFillColor(sf::Color::Red);
+    reset_button.setTexture(&restart_t1);
     reset_button.setPosition({x/2+20.f,0.f});
     //VARS:
     d=false;
@@ -39,6 +43,8 @@ Dinamica::Dinamica(float x, float y){
     help_b=false;
     start_b=false;
     restart_b=false;
+    add_line=false;
+    linedef=false;
 }
 
 void Dinamica::run(sf::RenderWindow &win){
@@ -92,20 +98,28 @@ void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
     if(!help_b){
         win.clear(sf::Color::White);
         float tr = time_pf.restart().asSeconds();
-        ts += ts/timeperframe;
+        ts += ts;
         for(int i=0;i<corps.size();i++){
             if(restart_b){
                 start_b=false;
                 corps[i].shape.setPosition(corps[i].origin);
+                restart_b=false;
+                reset_button.setTexture(&restart_t1);
             }
             else if(!start_b){
                 corps[i].origin=corps[i].shape.getPosition();
             }
-            else if (ts >= 1.0f) {
+            else if (start_b) {
                 corps[i].run();
+                colision(win);
                 ts = 0.0f;
             }
             corps[i].draw(win);
+        }
+        if(restart_b && corps.size() == 0){
+            start_b=false;
+            restart_b=false;
+            reset_button.setTexture(&restart_t1);
         }
 
         if(button_click(button_menu) && s!=1){
@@ -122,6 +136,13 @@ void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
         }
         if(button_click(reset_button)){
             restart_b = !restart_b;
+            reset_button.setTexture(&restart_t2);
+        }
+
+        if(start_b == false){
+                startsm.setTexture(&start_t1);
+        }else{
+            startsm.setTexture(&start_t2);
         }
 
         if(s==2){
@@ -145,7 +166,7 @@ void Dinamica::Draw(sf::RenderWindow &win, Help &Mhelp){
 void Dinamica::colision(sf::RenderWindow &win){
     for(int i=0; i < corps.size();i++){
         for(int j=0; j < corps.size();j++){
-            if(corps[i].shape.getGlobalBounds().findIntersection(corps[j].shape.getGlobalBounds())){
+            if(corps[i].shape.getGlobalBounds().findIntersection(corps[j].shape.getGlobalBounds()) && i!=j){
                 corps[i].vel={0.f,0.f};
                 corps[i].force={0.f,0.f};
                 corps[i].acel={0.f,0.f};

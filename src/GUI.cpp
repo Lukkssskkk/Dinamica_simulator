@@ -30,6 +30,7 @@ void Dinamica::menu(sf::RenderWindow &win){
 
     space_menu.setPosition({0.f,0.f});
     space_menu.setFillColor(sf::Color::Blue);
+    win.draw(space_menu);
     text_def(o,"add OBJ",sf::Color::White,0,40);
     text_def(b,"add block",sf::Color::White,0,60);
     text_def(c,"add Line",sf::Color::White,0,80);
@@ -45,6 +46,10 @@ void Dinamica::menu(sf::RenderWindow &win){
     text_def(k,"K el: ",sf::Color::Black,0,200);
     text_def(tipf,"tick/s",sf::Color::White,0,220);
     text_def(help,"help?:",sf::Color::White,0,240);
+
+    if(add_line && !corps.empty()){
+            line_def(win);
+    }
 
     if( (add_obj_mov==true ||button_click(o) && selection==-1) &&corps.size()<11){
         o.setString("QUIT");
@@ -73,10 +78,12 @@ void Dinamica::menu(sf::RenderWindow &win){
         }
         if(corptype!=-1){
             add_obj_mov=false;
+            if(corps.back().type!=3){
             corps.back().shape.setPosition({(float)win.getSize().x/2,(float)win.getSize().y/2});
             corps.back().shape_p.setPosition({(float)win.getSize().x/2,(float)win.getSize().y/2});
-            if(corps.back().type == 3){
-                //corps.back().defcord(win);
+            }
+            else{
+                add_line=true;
             }
         }
         if(corps.size()==11){
@@ -96,28 +103,6 @@ void Dinamica::menu(sf::RenderWindow &win){
     if(button_click(help)){
         help_b=true;
     }
-
-    win.draw(space_menu);
-    if(add_obj_mov==false){
-        win.draw(o);
-        win.draw(f);
-        win.draw(v);
-        win.draw(ac);
-        win.draw(an);
-        win.draw(qm);
-        win.draw(m);
-        win.draw(k);
-        win.draw(kat);
-        win.draw(tipf);
-        win.draw(help);
-    }else{
-        win.draw(p);
-        win.draw(pm);
-        win.draw(b);
-        win.draw(c);
-        win.draw(o);
-    }
-
     if(button_click(tipf) || g==9){
             g=9;
             d=false;
@@ -202,6 +187,29 @@ void Dinamica::menu(sf::RenderWindow &win){
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape)){
             selection=-1;
         }
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Delete)){
+            corps.erase(corps.begin() + selection);
+            selection=-1;
+        }
+    }
+    if(add_obj_mov==false){
+        win.draw(o);
+        win.draw(f);
+        win.draw(v);
+        win.draw(ac);
+        win.draw(an);
+        win.draw(qm);
+        win.draw(m);
+        win.draw(k);
+        win.draw(kat);
+        win.draw(tipf);
+        win.draw(help);
+    }else{
+        win.draw(p);
+        win.draw(pm);
+        win.draw(b);
+        win.draw(c);
+        win.draw(o);
     }
 }
 
@@ -331,5 +339,28 @@ void Dinamica::infos(sf::RenderWindow &win) {
         win.draw(ke[i]);
         win.draw(kat[i]);
         win.draw(mass[i]);
+    }
+}
+
+void Dinamica::line_def(sf::RenderWindow &win){
+    if(isclicked && !linedef){
+        p1 = (sf::Vector2f)sf::Mouse::getPosition(win);
+        isclicked=false;
+        linedef=true;
+    }
+    else if(isclicked && linedef){
+        p2 = (sf::Vector2f)sf::Mouse::getPosition(win);
+
+        sf::Vector2f dir = p2 - p1;
+        float c = std::hypot(dir.x,dir.y);
+        float ang = std::atan2(dir.y, dir.x) * 180.f / 3.14159265f;
+
+        corps.back().shape.setSize({c, 10.f});
+        corps.back().shape.setFillColor(sf::Color::Black);
+        corps.back().shape.setPosition(p1);
+        corps.back().angle = sf::degrees(ang);
+        linedef=false;
+        isclicked=false;
+        add_line=false;
     }
 }

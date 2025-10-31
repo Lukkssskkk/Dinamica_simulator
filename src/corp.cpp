@@ -6,24 +6,28 @@ Corp::Corp(int i){
         shape.setFillColor(sf::Color::Red);
         shape.setOrigin({25.f,25.f});
         type=0;
+        p=false;
     }
     else if(i==1){
         shape_p.setRadius(25.f);
         shape_p.setFillColor(sf::Color::Cyan);
         shape_p.setOrigin({25.f,25.f});
         type=1;
+        p=false;
     }
     else if(i==2){
         shape_p.setRadius(25.f);
         shape_p.setFillColor(sf::Color::Blue);
         shape_p.setOrigin({25.f,25.f});
         type=2;
+        p=false;
     }
     else if(i==3){
         shape.setSize({5.f,5.f});
         shape.setFillColor(sf::Color::Black);
         shape.setOrigin({2.5f,2.5f});
         type=3;
+        p=true;
     }
 
     vel.x= 0.0;
@@ -33,7 +37,7 @@ Corp::Corp(int i){
     force.x=0.0;
     force.y=0.0;
     angle=sf::degrees(0.f);
-    mass=0.0;
+    mass=1.0;
     k_el=0.0;
     k_at=0.0;
     k_ata=0.0;
@@ -59,6 +63,7 @@ void Corp::run(){
 
 void Corp::draw(sf::RenderWindow &win){
     if(type==0 || type==3){
+        shape.setRotation(angle);
         win.draw(shape);
     }else if(type==1 || type==2){
         win.draw(shape_p);
@@ -67,9 +72,23 @@ void Corp::draw(sf::RenderWindow &win){
 
 void Corp::selected(sf::RenderWindow &win,bool x){
     if(x == true){
+        sf::Font font;
+        sf::RectangleShape f_dem,v_dem,a_dem;
+        font.openFromFile("../img/font.ttf");
+        sf::Text values(font);
+        values.setString("M:"+ std::to_string((int)mass) + '\n' 
+        +"F:"+ std::to_string((int)force.x) + ';' + std::to_string((int)force.y) +'\n'
+        +"V:"+ std::to_string((int)vel.x) + ';' + std::to_string((int)vel.y) + '\n'
+        +"a:"+  std::to_string((int)acel.x) + ';' + std::to_string((int)acel.y) + '\n'
+        +"W:"+  std::to_string((int)work) + '\n'
+        );
+        values.setCharacterSize(10);
+
         if(type ==0 || type==3){
+            values.setPosition({shape.getPosition().x-25.f,shape.getPosition().y-25.f});
             shape.setOutlineColor(sf::Color::Black);
-            shape.setOutlineThickness(5.f);
+            shape.setOutlineThickness(6.f);
+            win.draw(values);
         }
         else if(type==1 || type==2){
             shape_p.setOutlineColor(sf::Color::Black);
@@ -127,3 +146,7 @@ void Corp::dist_calc(){
     shape.setPosition({shape.getPosition().x+vel.x/10,shape.getPosition().y+vel.y/10});
 }
 //float Corp::polia(){}
+
+void Corp::polia(sf::RenderWindow &win){
+    //TODO
+}

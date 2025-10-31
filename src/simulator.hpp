@@ -6,9 +6,9 @@
 #include<iostream>
 #include<cmath>
 #include<vector>
-#include <iomanip>
-#include <sstream>
-#include <fstream>
+#include<iomanip>
+#include<sstream>
+#include<fstream>
 #include<algorithm>
 
 #define button_click(B) (mouse.getGlobalBounds().findIntersection(B.getGlobalBounds()) && isclicked==true)
@@ -19,23 +19,22 @@ class Corp{
     void run();
     void draw(sf::RenderWindow &win);
     void selected(sf::RenderWindow &win,bool x);
-    void line_def();
 
     sf::RectangleShape shape;
     sf::CircleShape shape_p;
     sf::Vector2f pos,vel,acel,force,origin;
     sf::Angle angle;
     float mass,k_el,k_at,work,L,k_ela,k_ata;
-    int connected[4];
+    bool p;
     int type;
+    int connected[4];
 
     private:
-
+    
     void F();
     void Fat();
     void Fel();
-    void polia();
-    void line();
+    void polia(sf::RenderWindow &win);
     void Work_calc();
     void vel_calc();
     void acel_calc();
@@ -65,20 +64,22 @@ class Dinamica{
         void run(sf::RenderWindow &window);
     private:
         int8_t selection,g,s;
-        bool isclicked,text,fo,d,help_b,start_b,restart_b;
+        bool isclicked,text,fo,d,help_b,start_b,restart_b,add_line,linedef;
         float timeperframe;
 
         std::string input_text;
         sf::RectangleShape mouse,startsm,reset_button,button_info,button_menu;
         std::vector<Corp> corps;
-        sf::Texture info_t,menu_t;
+        sf::Texture info_t,menu_t,start_t1,start_t2,restart_t1,restart_t2;
         sf::Font font;
+        sf::Vector2f p1,p2;
 
         //GUI:
         float input(sf::RenderWindow &win,sf::Vector2f pos);
         void menu(sf::RenderWindow &win);
         void infos(sf::RenderWindow &win);
         void editpos(int x);
+        void line_def(sf::RenderWindow &win);
         //Funções padrões:
         void colision(sf::RenderWindow &win);
         void processEvents(sf::RenderWindow &win);
